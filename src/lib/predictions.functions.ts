@@ -48,8 +48,8 @@ ${result.vulnerabilities.map(v => `- [${v.severity}] ${v.title} — evidence: ${
         input_hash: result.input_hash,
         risk_score: result.risk_score,
         risk_level: result.risk_level,
-        breakdown: result.breakdown,
-        vulnerabilities: result.vulnerabilities,
+        breakdown: result.breakdown as unknown as Record<string, number>,
+        vulnerabilities: result.vulnerabilities as unknown as Record<string, unknown>[],
         ai_explanation,
       })
       .select()

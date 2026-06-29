@@ -14,7 +14,128 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      chat_messages: {
+        Row: {
+          created_at: string
+          id: string
+          message: Json
+          role: string
+          thread_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: Json
+          role: string
+          thread_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: Json
+          role?: string
+          thread_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "chat_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_threads: {
+        Row: {
+          created_at: string
+          id: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      predictions: {
+        Row: {
+          ai_explanation: string | null
+          breakdown: Json
+          created_at: string
+          id: string
+          input_hash: string
+          input_text: string
+          input_type: string
+          risk_level: string
+          risk_score: number
+          user_id: string
+          vulnerabilities: Json
+        }
+        Insert: {
+          ai_explanation?: string | null
+          breakdown: Json
+          created_at?: string
+          id?: string
+          input_hash: string
+          input_text: string
+          input_type: string
+          risk_level: string
+          risk_score: number
+          user_id: string
+          vulnerabilities: Json
+        }
+        Update: {
+          ai_explanation?: string | null
+          breakdown?: Json
+          created_at?: string
+          id?: string
+          input_hash?: string
+          input_text?: string
+          input_type?: string
+          risk_level?: string
+          risk_score?: number
+          user_id?: string
+          vulnerabilities?: Json
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          email: string | null
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { Json } from "@/integrations/supabase/types";
 import { predictThreat, type InputType } from "@/lib/predictor";
 import { z } from "zod";
 
@@ -48,8 +49,8 @@ ${result.vulnerabilities.map(v => `- [${v.severity}] ${v.title} — evidence: ${
         input_hash: result.input_hash,
         risk_score: result.risk_score,
         risk_level: result.risk_level,
-        breakdown: result.breakdown as unknown as Record<string, number>,
-        vulnerabilities: result.vulnerabilities as unknown as Record<string, unknown>[],
+        breakdown: result.breakdown as unknown as Json,
+        vulnerabilities: result.vulnerabilities as unknown as Json,
         ai_explanation,
       })
       .select()

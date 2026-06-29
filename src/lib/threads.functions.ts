@@ -58,6 +58,7 @@ export const getThreadMessages = createServerFn({ method: "POST" })
       .eq("thread_id", data.threadId)
       .order("created_at", { ascending: true });
     if (error) throw new Error(error.message);
-    // Return as JSON-serializable array of message objects.
-    return { messages: (rows ?? []).map((r) => r.message as unknown as Record<string, unknown>) };
+    // Serialize via JSON round-trip so the value is plain Json (no `unknown` props).
+    const messages = JSON.parse(JSON.stringify((rows ?? []).map((r) => r.message)));
+    return { messages: messages as unknown[] };
   });

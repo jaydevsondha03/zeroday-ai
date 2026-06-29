@@ -95,8 +95,8 @@ function AnalyzePage() {
 }
 
 type ResultRow = {
-  risk_score: number; risk_level: string; breakdown: Record<string, number>;
-  vulnerabilities: Array<{ id: string; title: string; severity: string; evidence: string }>;
+  risk_score: number | string; risk_level: string; breakdown: unknown;
+  vulnerabilities: unknown;
   ai_explanation: string | null;
 };
 
@@ -115,6 +115,8 @@ const SEV_COLOR: Record<string, string> = {
 
 function Report({ result }: { result: ResultRow }) {
   const Icon = LEVEL_ICON[result.risk_level] ?? ShieldQuestion;
+  const breakdown = (result.breakdown ?? {}) as Record<string, number>;
+  const vulns = (result.vulnerabilities ?? []) as Array<{ id: string; title: string; severity: string; evidence: string }>;
   return (
     <div className="mt-6 grid gap-4 lg:grid-cols-3">
       <div className={`glass p-6 lg:col-span-1 neon-glow`}>
@@ -131,7 +133,7 @@ function Report({ result }: { result: ResultRow }) {
           <div className="text-xs text-muted-foreground">/ 100 — deterministic</div>
         </div>
         <div className="mt-6 space-y-3">
-          {Object.entries(result.breakdown).map(([k, v]) => (
+          {Object.entries(breakdown).map(([k, v]) => (
             <div key={k}>
               <div className="flex justify-between text-xs">
                 <span className="capitalize text-muted-foreground">{k.replace(/_/g, " ")}</span>
@@ -145,11 +147,11 @@ function Report({ result }: { result: ResultRow }) {
 
       <div className="glass p-6 lg:col-span-2">
         <h3 className="mb-4 font-display text-lg">Detected vulnerabilities</h3>
-        {result.vulnerabilities.length === 0 ? (
+        {vulns.length === 0 ? (
           <p className="text-sm text-muted-foreground">No explicit signature matches. Score reflects baseline heuristics.</p>
         ) : (
           <ul className="space-y-2">
-            {result.vulnerabilities.map((v) => (
+            {vulns.map((v) => (
               <li key={v.id} className="rounded-md border border-border/60 bg-background/40 p-3">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">{v.title}</span>

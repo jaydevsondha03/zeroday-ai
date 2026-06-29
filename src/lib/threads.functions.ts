@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import type { Json } from "@/integrations/supabase/types";
 
 
 export const listThreads = createServerFn({ method: "GET" })
@@ -59,6 +60,6 @@ export const getThreadMessages = createServerFn({ method: "POST" })
       .order("created_at", { ascending: true });
     if (error) throw new Error(error.message);
     // Serialize via JSON round-trip so the value is plain Json (no `unknown` props).
-    const messages = JSON.parse(JSON.stringify((rows ?? []).map((r) => r.message)));
-    return { messages: messages as unknown[] };
+    const messages = JSON.parse(JSON.stringify((rows ?? []).map((r) => r.message))) as Json[];
+    return { messages };
   });

@@ -10,7 +10,6 @@ const NAV = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/analyze", label: "Analyze", icon: ScanLine },
   { to: "/history", label: "History", icon: History },
-  { to: "/chat", label: "AI Assistant", icon: MessageSquareCode },
 ] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {

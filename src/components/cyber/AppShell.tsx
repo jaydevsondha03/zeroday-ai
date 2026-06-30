@@ -2,7 +2,7 @@ import { Link, useRouter } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { Particles } from "./Particles";
 import { supabase } from "@/integrations/supabase/client";
-import { Shield, LayoutDashboard, ScanLine, History, MessageSquareCode, LogOut } from "lucide-react";
+import { Shield, LayoutDashboard, ScanLine, History, LogOut } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 
@@ -10,7 +10,6 @@ const NAV = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/analyze", label: "Analyze", icon: ScanLine },
   { to: "/history", label: "History", icon: History },
-  { to: "/chat", label: "AI Assistant", icon: MessageSquareCode },
 ] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {

@@ -31,12 +31,14 @@ function AuthPage() {
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const [registered, setRegistered] = useState<string | null>(null);
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     try {
       if (isRegister) {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email, password,
           options: {
             data: { display_name: name || email.split("@")[0] },
@@ -44,13 +46,20 @@ function AuthPage() {
           },
         });
         if (error) throw error;
+        // If email confirmation is required, session will be null
+        if (!data.session) {
+          setRegistered(email);
+          toast.success("Check your inbox to confirm your email.");
+          return;
+        }
         toast.success("Account created. You're in.");
+        router.navigate({ to: "/dashboard", replace: true });
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         toast.success("Welcome back.");
+        router.navigate({ to: "/dashboard", replace: true });
       }
-      router.navigate({ to: "/dashboard", replace: true });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Authentication failed");
     } finally {
@@ -66,39 +75,70 @@ function AuthPage() {
           <Shield className="h-6 w-6 text-neon-cyan" />
           <span className="font-display tracking-widest neon-text">AI-ZERODAY</span>
         </Link>
-        <h1 className="text-center font-display text-2xl">
-          {isRegister ? "Create access" : "Authenticate"}
-        </h1>
-        <p className="mt-1 text-center text-sm text-muted-foreground">
-          {isRegister ? "Provision your security workspace." : "Resume your threat intelligence session."}
-        </p>
 
-        <form onSubmit={submit} className="mt-6 space-y-4">
-          {isRegister && (
-            <div>
-              <Label htmlFor="name">Display name</Label>
-              <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="analyst-01" autoComplete="name" />
+        {registered ? (
+          <div className="text-center">
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-neon-cyan/10 ring-1 ring-neon-cyan/40">
+              <Shield className="h-7 w-7 text-neon-cyan" />
             </div>
-          )}
-          <div>
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
+            <h1 className="font-display text-2xl neon-text">Confirm your email</h1>
+            <p className="mt-2 text-sm text-muted-foreground">
+              We sent a confirmation link to <span className="text-foreground">{registered}</span>.
+              Click the link in that email to activate your account, then return here to sign in.
+            </p>
+            <p className="mt-3 text-xs text-muted-foreground/80">
+              Tip: check your spam folder if it doesn't arrive within a minute.
+            </p>
+            <Button
+              className="mt-6 w-full neon-glow"
+              onClick={() => { setRegistered(null); setIsRegister(false); setPassword(""); }}
+            >
+              Go to sign in
+            </Button>
           </div>
-          <div>
-            <Label htmlFor="password">Password</Label>
-            <Input id="password" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} autoComplete={isRegister ? "new-password" : "current-password"} />
-          </div>
-          <Button type="submit" disabled={loading} className="w-full neon-glow">
-            {loading ? "Processing…" : isRegister ? "Create account" : "Sign in"}
-          </Button>
-        </form>
+        ) : (
+          <>
+            <h1 className="text-center font-display text-2xl">
+              {isRegister ? "Create access" : "Authenticate"}
+            </h1>
+            <p className="mt-1 text-center text-sm text-muted-foreground">
+              {isRegister ? "Provision your security workspace." : "Resume your threat intelligence session."}
+            </p>
 
-        <button
-          onClick={() => setIsRegister((v) => !v)}
-          className="mt-4 w-full text-center text-sm text-muted-foreground hover:text-foreground"
-        >
-          {isRegister ? "Already have an account? Sign in" : "No account? Create one"}
-        </button>
+            <form onSubmit={submit} className="mt-6 space-y-4">
+              {isRegister && (
+                <div>
+                  <Label htmlFor="name">Display name</Label>
+                  <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="analyst-01" autoComplete="name" />
+                </div>
+              )}
+              <div>
+                <Label htmlFor="email">Email</Label>
+                <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
+              </div>
+              <div>
+                <Label htmlFor="password">Password</Label>
+                <Input id="password" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} autoComplete={isRegister ? "new-password" : "current-password"} />
+              </div>
+              <Button type="submit" disabled={loading} className="w-full neon-glow">
+                {loading ? "Processing…" : isRegister ? "Create account" : "Sign in"}
+              </Button>
+            </form>
+
+            <p className="mt-3 text-center text-xs text-muted-foreground/70">
+              {isRegister
+                ? "You'll get a confirmation email. Sessions stay signed in for 3 days."
+                : "Your session stays active for 3 days, then you'll need to sign in again."}
+            </p>
+
+            <button
+              onClick={() => setIsRegister((v) => !v)}
+              className="mt-4 w-full text-center text-sm text-muted-foreground hover:text-foreground"
+            >
+              {isRegister ? "Already have an account? Sign in" : "No account? Create one"}
+            </button>
+          </>
+        )}
       </div>
     </div>
   );

@@ -2,7 +2,7 @@ import { Link, useRouter } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { Particles } from "./Particles";
 import { supabase } from "@/integrations/supabase/client";
-import { Shield, LayoutDashboard, ScanLine, History, MessageSquareCode, LogOut } from "lucide-react";
+import { Shield, LayoutDashboard, ScanLine, History, LogOut } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 

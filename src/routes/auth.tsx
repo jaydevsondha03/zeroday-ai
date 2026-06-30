@@ -31,12 +31,14 @@ function AuthPage() {
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const [registered, setRegistered] = useState<string | null>(null);
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     try {
       if (isRegister) {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email, password,
           options: {
             data: { display_name: name || email.split("@")[0] },
@@ -44,13 +46,20 @@ function AuthPage() {
           },
         });
         if (error) throw error;
+        // If email confirmation is required, session will be null
+        if (!data.session) {
+          setRegistered(email);
+          toast.success("Check your inbox to confirm your email.");
+          return;
+        }
         toast.success("Account created. You're in.");
+        router.navigate({ to: "/dashboard", replace: true });
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         toast.success("Welcome back.");
+        router.navigate({ to: "/dashboard", replace: true });
       }
-      router.navigate({ to: "/dashboard", replace: true });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Authentication failed");
     } finally {

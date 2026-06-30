@@ -58,7 +58,7 @@ ${result.vulnerabilities.map(v => `- [${v.severity}] ${v.title} — evidence: ${
 
     if (error) {
       console.error("Insert prediction error:", error);
-      throw new Error(error.message);
+      throw new Error("Unable to save analysis. Please try again.");
     }
     return row;
   });
@@ -71,7 +71,10 @@ export const listPredictions = createServerFn({ method: "GET" })
       .select("*")
       .order("created_at", { ascending: false })
       .limit(200);
-    if (error) throw new Error(error.message);
+    if (error) {
+      console.error("List predictions error:", error);
+      throw new Error("Unable to load history.");
+    }
     return data ?? [];
   });
 
@@ -80,6 +83,9 @@ export const deletePrediction = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase.from("predictions").delete().eq("id", data.id);
-    if (error) throw new Error(error.message);
+    if (error) {
+      console.error("Delete prediction error:", error);
+      throw new Error("Unable to delete record.");
+    }
     return { ok: true };
   });

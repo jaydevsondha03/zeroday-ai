@@ -58,7 +58,7 @@ ${result.vulnerabilities.map(v => `- [${v.severity}] ${v.title} — evidence: ${
 
     if (error) {
       console.error("Insert prediction error:", error);
-      throw new Error(error.message);
+      throw new Error("Unable to save analysis. Please try again.");
     }
     return row;
   });

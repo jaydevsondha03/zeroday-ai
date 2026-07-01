@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { Particles } from "@/components/cyber/Particles";
-import { Shield, ScanLine, Brain, Activity, Lock, Cpu } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { Shield, ScanLine, Brain, Activity, Lock, Cpu, LayoutDashboard } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({

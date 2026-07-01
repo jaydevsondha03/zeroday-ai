@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { Particles } from "@/components/cyber/Particles";
-import { Shield, ScanLine, Brain, Activity, Lock, Cpu } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { Shield, ScanLine, Brain, Activity, Lock, Cpu, LayoutDashboard } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -15,6 +17,13 @@ export const Route = createFileRoute("/")({
 });
 
 function Landing() {
+  const [authed, setAuthed] = useState<boolean | null>(null);
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => setAuthed(!!data.session));
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => setAuthed(!!session));
+    return () => sub.subscription.unsubscribe();
+  }, []);
+
   return (
     <div className="relative min-h-screen scan-lines">
       <Particles density={90} />
@@ -24,10 +33,18 @@ function Landing() {
           <span className="font-display tracking-widest neon-text">AI-ZERODAY</span>
         </div>
         <nav className="flex items-center gap-3 text-sm">
-          <Link to="/auth" className="rounded-md px-3 py-2 text-muted-foreground hover:text-foreground">Sign in</Link>
-          <Link to="/auth" search={{ mode: "register" }} className="animate-pulse-neon rounded-md bg-primary px-4 py-2 font-medium text-primary-foreground">
-            Get access
-          </Link>
+          {authed ? (
+            <Link to="/dashboard" className="animate-pulse-neon inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 font-medium text-primary-foreground">
+              <LayoutDashboard className="h-4 w-4" /> Go to dashboard
+            </Link>
+          ) : authed === false ? (
+            <>
+              <Link to="/auth" className="rounded-md px-3 py-2 text-muted-foreground hover:text-foreground">Sign in</Link>
+              <Link to="/auth" search={{ mode: "register" }} className="animate-pulse-neon rounded-md bg-primary px-4 py-2 font-medium text-primary-foreground">
+                Get access
+              </Link>
+            </>
+          ) : null}
         </nav>
       </header>
 
@@ -43,12 +60,20 @@ function Landing() {
           AI-ZeroDay-Predictor analyzes URLs, source code, and system logs to forecast zero-day vulnerabilities before exploitation — using deterministic heuristic scoring and an AI security analyst.
         </p>
         <div className="mt-8 flex justify-center gap-3">
-          <Link to="/auth" search={{ mode: "register" }} className="rounded-md bg-primary px-6 py-3 font-medium text-primary-foreground neon-glow">
-            Start scanning
-          </Link>
-          <Link to="/auth" className="rounded-md border border-border bg-card px-6 py-3 font-medium backdrop-blur">
-            Sign in
-          </Link>
+          {authed ? (
+            <Link to="/dashboard" className="rounded-md bg-primary px-6 py-3 font-medium text-primary-foreground neon-glow">
+              Open dashboard
+            </Link>
+          ) : (
+            <>
+              <Link to="/auth" search={{ mode: "register" }} className="rounded-md bg-primary px-6 py-3 font-medium text-primary-foreground neon-glow">
+                Start scanning
+              </Link>
+              <Link to="/auth" className="rounded-md border border-border bg-card px-6 py-3 font-medium backdrop-blur">
+                Sign in
+              </Link>
+            </>
+          )}
         </div>
       </section>
 

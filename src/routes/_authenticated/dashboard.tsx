@@ -75,6 +75,7 @@ function Dashboard() {
           {levelData.length ? (
             <ResponsiveContainer width="100%" height={240}>
               <PieChart>
+                <Tooltip content={<PieTooltip total={total} />} />
                 <Pie data={levelData} dataKey="value" nameKey="name" outerRadius={90} stroke="oklch(0.16 0.025 250)">
                   {levelData.map((d) => <Cell key={d.name} fill={LEVEL_COLORS[d.name]} />)}
                 </Pie>

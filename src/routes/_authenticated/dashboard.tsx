@@ -75,6 +75,7 @@ function Dashboard() {
           {levelData.length ? (
             <ResponsiveContainer width="100%" height={240}>
               <PieChart>
+                <Tooltip content={<PieTooltip total={total} />} />
                 <Pie data={levelData} dataKey="value" nameKey="name" outerRadius={90} stroke="oklch(0.16 0.025 250)">
                   {levelData.map((d) => <Cell key={d.name} fill={LEVEL_COLORS[d.name]} />)}
                 </Pie>
@@ -116,6 +117,18 @@ function Dashboard() {
 const tooltipStyle = {
   background: "oklch(0.18 0.028 252)", border: "1px solid oklch(0.82 0.18 200 / 0.3)", borderRadius: 8,
 };
+
+function PieTooltip({ active, payload, total }: { active?: boolean; payload?: Array<{ name: string; value: number }>; total: number }) {
+  if (!active || !payload || !payload.length) return null;
+  const { name, value } = payload[0];
+  const pct = total > 0 ? Math.round((value / total) * 100) : 0;
+  return (
+    <div style={tooltipStyle} className="px-2.5 py-1.5 text-xs text-foreground">
+      <div className="font-medium">{name}</div>
+      <div className="text-muted-foreground">{value} scans ({pct}%)</div>
+    </div>
+  );
+}
 
 function Empty() {
   return (

@@ -15,7 +15,17 @@ const predictionsQO = queryOptions({
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   loader: ({ context }) => context.queryClient.ensureQueryData(predictionsQO),
-  head: () => ({ meta: [{ title: "Dashboard — AI-ZeroDay-Predictor" }] }),
+  head: () => ({
+    meta: [
+      { title: "Dashboard — AI-ZeroDay-Predictor" },
+      { name: "description", content: "Threat analytics dashboard: risk distribution, average scores by input type, and recent scan timeline." },
+      { property: "og:title", content: "Threat dashboard — AI-ZeroDay-Predictor" },
+      { property: "og:description", content: "Live risk analytics across your recent zero-day vulnerability scans." },
+      { property: "og:url", content: "https://zeroday-ai.lovable.app/dashboard" },
+      { name: "robots", content: "noindex" },
+    ],
+    links: [{ rel: "canonical", href: "https://zeroday-ai.lovable.app/dashboard" }],
+  }),
   component: Dashboard,
 });
 
@@ -154,7 +164,7 @@ function StatCard({ icon: Icon, label, value, accent }: { icon: typeof Shield; l
 function Card({ title, children, className = "" }: { title: string; children: React.ReactNode; className?: string }) {
   return (
     <div className={`glass p-5 ${className}`}>
-      <h3 className="mb-3 text-sm uppercase tracking-wider text-muted-foreground">{title}</h3>
+      <h2 className="mb-3 text-sm uppercase tracking-wider text-muted-foreground">{title}</h2>
       {children}
     </div>
   );

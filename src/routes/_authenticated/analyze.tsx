@@ -14,7 +14,17 @@ import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/analyze")({
-  head: () => ({ meta: [{ title: "Analyze — AI-ZeroDay-Predictor" }] }),
+  head: () => ({
+    meta: [
+      { title: "Analyze — AI-ZeroDay-Predictor" },
+      { name: "description", content: "Multi-surface threat scanner for URLs, code snippets, and system logs with deterministic scoring and AI explanations." },
+      { property: "og:title", content: "Threat analyzer — AI-ZeroDay-Predictor" },
+      { property: "og:description", content: "Scan URLs, code, and logs with a weighted rule engine and an AI security analyst." },
+      { property: "og:url", content: "https://zeroday-ai.lovable.app/analyze" },
+      { name: "robots", content: "noindex" },
+    ],
+    links: [{ rel: "canonical", href: "https://zeroday-ai.lovable.app/analyze" }],
+  }),
   component: AnalyzePage,
 });
 
@@ -146,7 +156,7 @@ function Report({ result }: { result: ResultRow }) {
       </div>
 
       <div className="glass p-6 lg:col-span-2">
-        <h3 className="mb-4 font-display text-lg">Detected vulnerabilities</h3>
+        <h2 className="mb-4 font-display text-lg">Detected vulnerabilities</h2>
         {vulns.length === 0 ? (
           <p className="text-sm text-muted-foreground">No explicit signature matches. Score reflects baseline heuristics.</p>
         ) : (
@@ -165,7 +175,7 @@ function Report({ result }: { result: ResultRow }) {
 
         {result.ai_explanation && (
           <>
-            <h3 className="mt-6 mb-2 font-display text-lg">AI security analyst</h3>
+            <h2 className="mt-6 mb-2 font-display text-lg">AI security analyst</h2>
             <div className="prose prose-invert prose-sm max-w-none rounded-md border border-border/60 bg-background/40 p-4">
               <ReactMarkdown>{result.ai_explanation}</ReactMarkdown>
             </div>

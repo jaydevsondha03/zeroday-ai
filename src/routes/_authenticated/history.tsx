@@ -14,7 +14,17 @@ const predictionsQO = queryOptions({ queryKey: ["predictions"], queryFn: () => l
 
 export const Route = createFileRoute("/_authenticated/history")({
   loader: ({ context }) => context.queryClient.ensureQueryData(predictionsQO),
-  head: () => ({ meta: [{ title: "History — AI-ZeroDay-Predictor" }] }),
+  head: () => ({
+    meta: [
+      { title: "History — AI-ZeroDay-Predictor" },
+      { name: "description", content: "Browse and filter your past zero-day vulnerability scans with severity, input type, and timestamp." },
+      { property: "og:title", content: "Scan history — AI-ZeroDay-Predictor" },
+      { property: "og:description", content: "Filterable log of your previous threat scans and their AI-generated findings." },
+      { property: "og:url", content: "https://zeroday-ai.lovable.app/history" },
+      { name: "robots", content: "noindex" },
+    ],
+    links: [{ rel: "canonical", href: "https://zeroday-ai.lovable.app/history" }],
+  }),
   component: HistoryPage,
 });
 
@@ -80,7 +90,7 @@ function HistoryPage() {
               </div>
               <code className="mt-1 block truncate font-mono text-xs text-muted-foreground">{p.input_text.slice(0, 160)}</code>
             </div>
-            <Button variant="ghost" size="icon" onClick={() => removeMut.mutate(p.id)} className="text-muted-foreground hover:text-neon-red">
+            <Button variant="ghost" size="icon" aria-label="Delete scan" onClick={() => removeMut.mutate(p.id)} className="text-muted-foreground hover:text-neon-red">
               <Trash2 className="h-4 w-4" />
             </Button>
           </div>

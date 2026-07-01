@@ -75,6 +75,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/f0c91396-0c2b-46c6-8027-db57645f3a25" },
     ],
     links: [{ rel: "stylesheet", href: appCss }],
+    scripts: [{ src: "https://www.noupe.com/embed/019f1761a61a7672ad719334adffb8e4e896.js", async: true }],
   }),
   shellComponent: RootShell,
   component: RootComponent,

@@ -1,0 +1,10 @@
+# AI-ZeroDay-Predictor
+
+> AI-powered cybersecurity intelligence platform that predicts zero-day vulnerabilities in URLs, source code, and system logs using deterministic heuristic scoring and AI-generated explanations.
+
+AI-ZeroDay-Predictor combines a weighted rule engine (SQLi, XSS, RCE, weak auth, CORS leaks, and more) with an AI security analyst that explains findings and suggests fixes. Sessions are per-user, results are reproducible, and a live dashboard tracks risk trends.
+
+## Pages
+
+- [Home](/): Overview of the platform, feature highlights, and getting started.
+- [Sign in](/auth): Create an account or sign in to access the scanner and history.

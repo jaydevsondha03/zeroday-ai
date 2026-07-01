@@ -16,8 +16,12 @@ export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "Sign in — AI-ZeroDay-Predictor" },
-      { name: "description", content: "Sign in or create an account to start scanning for zero-day vulnerabilities." },
+      { name: "description", content: "Sign in or create an AI-ZeroDay-Predictor account to start scanning URLs, code, and logs for zero-day vulnerabilities." },
+      { property: "og:title", content: "Sign in — AI-ZeroDay-Predictor" },
+      { property: "og:description", content: "Access the deterministic threat scanner and AI security analyst." },
+      { property: "og:url", content: "https://zeroday-ai.lovable.app/auth" },
     ],
+    links: [{ rel: "canonical", href: "https://zeroday-ai.lovable.app/auth" }],
   }),
   component: AuthPage,
 });

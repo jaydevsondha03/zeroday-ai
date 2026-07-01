@@ -60,12 +60,20 @@ function Landing() {
           AI-ZeroDay-Predictor analyzes URLs, source code, and system logs to forecast zero-day vulnerabilities before exploitation — using deterministic heuristic scoring and an AI security analyst.
         </p>
         <div className="mt-8 flex justify-center gap-3">
-          <Link to="/auth" search={{ mode: "register" }} className="rounded-md bg-primary px-6 py-3 font-medium text-primary-foreground neon-glow">
-            Start scanning
-          </Link>
-          <Link to="/auth" className="rounded-md border border-border bg-card px-6 py-3 font-medium backdrop-blur">
-            Sign in
-          </Link>
+          {authed ? (
+            <Link to="/dashboard" className="rounded-md bg-primary px-6 py-3 font-medium text-primary-foreground neon-glow">
+              Open dashboard
+            </Link>
+          ) : (
+            <>
+              <Link to="/auth" search={{ mode: "register" }} className="rounded-md bg-primary px-6 py-3 font-medium text-primary-foreground neon-glow">
+                Start scanning
+              </Link>
+              <Link to="/auth" className="rounded-md border border-border bg-card px-6 py-3 font-medium backdrop-blur">
+                Sign in
+              </Link>
+            </>
+          )}
         </div>
       </section>
 

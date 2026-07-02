@@ -62,6 +62,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "theme-color", content: "#22d3ee" },
       { title: "AI-ZeroDay-Predictor" },
       { name: "description", content: "AI-powered cybersecurity intelligence — scan URLs, code, and logs to forecast zero-day vulnerabilities." },
       { name: "author", content: "AI-ZeroDay-Predictor" },
@@ -69,9 +70,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "stylesheet", href: appCss }],
+    links: [
+      { rel: "stylesheet", href: appCss },
+      { rel: "manifest", href: "/site.webmanifest" },
+      { rel: "apple-touch-icon", href: "/favicon.ico" },
+    ],
     scripts: [
-      { src: "https://www.noupe.com/embed/019f1761a61a7672ad719334adffb8e4e896.js", async: true },
       {
         type: "application/ld+json",
         children: JSON.stringify({

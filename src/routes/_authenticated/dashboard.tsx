@@ -63,17 +63,17 @@ function Dashboard() {
 
   return (
     <AppShell>
-      <div className="mb-6 flex items-end justify-between">
-        <div>
-          <h1 className="font-display text-3xl">Threat dashboard</h1>
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div className="min-w-0">
+          <h1 className="font-display text-2xl sm:text-3xl">Threat dashboard</h1>
           <p className="text-sm text-muted-foreground">Risk analytics across your recent scans.</p>
         </div>
-        <Link to="/analyze" className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground neon-glow">
+        <Link to="/analyze" className="inline-flex w-full items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground neon-glow sm:w-auto">
           New scan
         </Link>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
         <StatCard icon={Target} label="Total scans" value={total} accent="cyan" />
         <StatCard icon={Activity} label="Avg risk score" value={avgScore} accent="amber" />
         <StatCard icon={AlertTriangle} label="High severity" value={high} accent="violet" />

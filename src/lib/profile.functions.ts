@@ -22,7 +22,7 @@ export const updateMyProfile = createServerFn({ method: "POST" })
   }).parse(d))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const patch: Record<string, unknown> = {};
+    const patch: { display_name?: string; avatar_url?: string | null } = {};
     if (data.display_name !== undefined) patch.display_name = data.display_name;
     if (data.avatar_url !== undefined) patch.avatar_url = data.avatar_url;
     const { error } = await supabase.from("profiles").update(patch).eq("id", userId);

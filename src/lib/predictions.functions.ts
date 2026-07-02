@@ -89,3 +89,22 @@ export const deletePrediction = createServerFn({ method: "POST" })
     }
     return { ok: true };
   });
+
+export const getPrediction = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: row, error } = await supabase
+      .from("predictions")
+      .select("*")
+      .eq("id", data.id)
+      .eq("user_id", userId)
+      .maybeSingle();
+    if (error) {
+      console.error("Get prediction error:", error);
+      throw new Error("Unable to load prediction.");
+    }
+    if (!row) throw new Error("Not found.");
+    return row;
+  });

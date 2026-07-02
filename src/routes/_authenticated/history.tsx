@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useSuspenseQuery, queryOptions, useQueryClient, useMutation } from "@tanstack/react-query";
 import { AppShell } from "@/components/cyber/AppShell";
@@ -7,7 +7,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+import { Trash2, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 
 const predictionsQO = queryOptions({ queryKey: ["predictions"], queryFn: () => listPredictions() });
@@ -58,13 +58,13 @@ function HistoryPage() {
 
   return (
     <AppShell>
-      <h1 className="font-display text-3xl">Scan history</h1>
-      <p className="text-sm text-muted-foreground">All prior threat analyses on this account.</p>
+      <h1 className="font-display text-2xl sm:text-3xl">Scan history</h1>
+      <p className="text-sm text-muted-foreground">All prior threat analyses on this account. Tap a row to view the full report.</p>
 
-      <div className="mt-6 flex gap-3">
-        <Input placeholder="Search inputs…" value={search} onChange={(e) => setSearch(e.target.value)} className="max-w-sm" />
+      <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+        <Input placeholder="Search inputs…" value={search} onChange={(e) => setSearch(e.target.value)} className="sm:max-w-sm" />
         <Select value={level} onValueChange={setLevel}>
-          <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
+          <SelectTrigger className="w-full sm:w-44"><SelectValue /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All levels</SelectItem>
             <SelectItem value="Safe">Safe</SelectItem>
@@ -80,17 +80,20 @@ function HistoryPage() {
           <div className="glass p-8 text-center text-sm text-muted-foreground">No matching scans.</div>
         )}
         {filtered.map((p) => (
-          <div key={p.id} className="glass flex items-center gap-4 p-4">
-            <div className="font-display text-3xl neon-text w-20 text-center">{Number(p.risk_score).toFixed(0)}</div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <span className={`rounded border px-2 py-0.5 text-[10px] uppercase ${LEVEL_COLOR[p.risk_level]}`}>{p.risk_level}</span>
-                <span className="text-xs uppercase text-muted-foreground">{p.input_type}</span>
-                <span className="text-xs text-muted-foreground">{new Date(p.created_at).toLocaleString()}</span>
+          <div key={p.id} className="glass group flex items-center gap-3 p-3 sm:gap-4 sm:p-4">
+            <Link to="/history/$id" params={{ id: p.id }} className="flex flex-1 items-center gap-3 sm:gap-4 min-w-0">
+              <div className="font-display text-2xl sm:text-3xl neon-text w-14 sm:w-20 text-center shrink-0">{Number(p.risk_score).toFixed(0)}</div>
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className={`rounded border px-2 py-0.5 text-[10px] uppercase ${LEVEL_COLOR[p.risk_level]}`}>{p.risk_level}</span>
+                  <span className="text-xs uppercase text-muted-foreground">{p.input_type}</span>
+                  <span className="text-xs text-muted-foreground">{new Date(p.created_at).toLocaleString()}</span>
+                </div>
+                <code className="mt-1 block truncate font-mono text-xs text-muted-foreground">{p.input_text.slice(0, 160)}</code>
               </div>
-              <code className="mt-1 block truncate font-mono text-xs text-muted-foreground">{p.input_text.slice(0, 160)}</code>
-            </div>
-            <Button variant="ghost" size="icon" aria-label="Delete scan" onClick={() => removeMut.mutate(p.id)} className="text-muted-foreground hover:text-neon-red">
+              <ChevronRight className="hidden h-4 w-4 shrink-0 text-muted-foreground group-hover:text-neon-cyan sm:block" />
+            </Link>
+            <Button variant="ghost" size="icon" aria-label="Delete scan" onClick={() => removeMut.mutate(p.id)} className="shrink-0 text-muted-foreground hover:text-neon-red">
               <Trash2 className="h-4 w-4" />
             </Button>
           </div>

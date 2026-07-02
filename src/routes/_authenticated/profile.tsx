@@ -1,0 +1,156 @@
+import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { useEffect, useRef, useState } from "react";
+import { useMutation, useQueryClient, useSuspenseQuery, queryOptions } from "@tanstack/react-query";
+import { AppShell } from "@/components/cyber/AppShell";
+import { getMyProfile, updateMyProfile, deleteMyAccount } from "@/lib/profile.functions";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
+import { Loader2, Upload, Trash2 } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+
+const profileQO = queryOptions({ queryKey: ["my-profile"], queryFn: () => getMyProfile() });
+
+export const Route = createFileRoute("/_authenticated/profile")({
+  loader: ({ context }) => context.queryClient.ensureQueryData(profileQO),
+  head: () => ({
+    meta: [
+      { title: "Profile — AI-ZeroDay-Predictor" },
+      { name: "description", content: "Manage your account, avatar, and profile details." },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
+  component: ProfilePage,
+});
+
+function ProfilePage() {
+  const { data: profile } = useSuspenseQuery(profileQO);
+  const qc = useQueryClient();
+  const router = useRouter();
+  const updateFn = useServerFn(updateMyProfile);
+  const deleteFn = useServerFn(deleteMyAccount);
+  const fileInput = useRef<HTMLInputElement>(null);
+
+  const [displayName, setDisplayName] = useState(profile?.display_name ?? "");
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      if (!profile?.avatar_url) { setAvatarUrl(null); return; }
+      const { data } = await supabase.storage.from("avatars").createSignedUrl(profile.avatar_url, 60 * 60);
+      if (!cancelled) setAvatarUrl(data?.signedUrl ?? null);
+    })();
+    return () => { cancelled = true; };
+  }, [profile?.avatar_url]);
+
+  const saveMut = useMutation({
+    mutationFn: (patch: { display_name?: string; avatar_url?: string | null }) => updateFn({ data: patch }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["my-profile"] }); toast.success("Profile updated"); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const deleteMut = useMutation({
+    mutationFn: () => deleteFn(),
+    onSuccess: async () => {
+      await supabase.auth.signOut();
+      qc.clear();
+      toast.success("Account deleted");
+      router.navigate({ to: "/", replace: true });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  async function onPickFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 3 * 1024 * 1024) return toast.error("Max 3MB");
+    setUploading(true);
+    try {
+      const { data: u } = await supabase.auth.getUser();
+      if (!u.user) throw new Error("Not signed in");
+      const ext = file.name.split(".").pop()?.toLowerCase() || "png";
+      const path = `${u.user.id}/avatar-${Date.now()}.${ext}`;
+      const { error } = await supabase.storage.from("avatars").upload(path, file, { upsert: true, contentType: file.type });
+      if (error) throw error;
+      await saveMut.mutateAsync({ avatar_url: path });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploading(false);
+      if (fileInput.current) fileInput.current.value = "";
+    }
+  }
+
+  const initial = (displayName || profile?.email || "?").charAt(0).toUpperCase();
+
+  return (
+    <AppShell>
+      <h1 className="font-display text-2xl sm:text-3xl">Profile</h1>
+      <p className="text-sm text-muted-foreground">Manage your account.</p>
+
+      <div className="mt-6 grid gap-4 lg:grid-cols-3">
+        <div className="glass flex flex-col items-center p-6 lg:col-span-1">
+          <Avatar className="h-28 w-28 border-2 border-neon-cyan/50">
+            {avatarUrl && <AvatarImage src={avatarUrl} alt="Avatar" />}
+            <AvatarFallback className="bg-accent text-3xl">{initial}</AvatarFallback>
+          </Avatar>
+          <input ref={fileInput} type="file" accept="image/*" hidden onChange={onPickFile} />
+          <Button className="mt-4 w-full" variant="secondary" onClick={() => fileInput.current?.click()} disabled={uploading}>
+            {uploading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Uploading</> : <><Upload className="mr-2 h-4 w-4" /> Change photo</>}
+          </Button>
+        </div>
+
+        <div className="glass p-6 lg:col-span-2">
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="displayName">Display name</Label>
+              <Input id="displayName" value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
+            </div>
+            <div>
+              <Label htmlFor="email">Email</Label>
+              <Input id="email" value={profile?.email ?? ""} readOnly disabled />
+              <p className="mt-1 text-xs text-muted-foreground">Email is managed by your account provider.</p>
+            </div>
+            <div>
+              <Label>Member since</Label>
+              <p className="mt-1 text-sm text-muted-foreground">{profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : "—"}</p>
+            </div>
+            <Button onClick={() => saveMut.mutate({ display_name: displayName })} disabled={saveMut.isPending} className="neon-glow">
+              {saveMut.isPending ? "Saving…" : "Save changes"}
+            </Button>
+          </div>
+
+          <div className="mt-8 border-t border-border/40 pt-6">
+            <h2 className="font-display text-lg text-neon-red">Danger zone</h2>
+            <p className="mt-1 text-sm text-muted-foreground">Permanently delete your account and all associated scans, threads, and profile data. This cannot be undone.</p>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" className="mt-4"><Trash2 className="mr-2 h-4 w-4" /> Delete account</Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete your account?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This immediately and permanently removes your account, scan history, chat threads, and profile. This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => deleteMut.mutate()} className="bg-destructive hover:bg-destructive/90">
+                    {deleteMut.isPending ? "Deleting…" : "Delete permanently"}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        </div>
+      </div>
+    </AppShell>
+  );
+}

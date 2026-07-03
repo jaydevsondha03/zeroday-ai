@@ -150,3 +150,23 @@
   from { transform: translateY(0); }
   to { transform: translateY(-20px); }
 }
+
+/* Noupe chat widget: shrink on mobile and hide when overlays are open */
+@media (max-width: 768px) {
+  iframe[src*="noupe"],
+  div[id^="noupe"],
+  div[class*="noupe"] {
+    max-width: 64px !important;
+    max-height: 64px !important;
+    right: 12px !important;
+    bottom: max(12px, env(safe-area-inset-bottom)) !important;
+    border-radius: 9999px !important;
+    overflow: hidden !important;
+  }
+}
+body[data-overlay-open="1"] iframe[src*="noupe"],
+body[data-overlay-open="1"] div[id^="noupe"],
+body[data-overlay-open="1"] div[class*="noupe"] {
+  display: none !important;
+}
+

@@ -90,15 +90,18 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       {/* Mobile top bar */}
       <header className="glass sticky top-0 z-30 flex items-center justify-between gap-3 px-4 py-3 md:hidden">
-        <Sheet open={open} onOpenChange={setOpen}>
+        <Sheet open={open} onOpenChange={(v) => {
+          setOpen(v);
+          if (typeof document !== "undefined") document.body.dataset.overlayOpen = v ? "1" : "";
+        }}>
           <SheetTrigger asChild>
             <Button variant="ghost" size="icon" aria-label="Open menu"><Menu className="h-5 w-5" /></Button>
           </SheetTrigger>
           <SheetContent side="left" className="w-72 border-border/40 bg-background/95 p-4 backdrop-blur">
             <SheetTitle className="sr-only">Navigation</SheetTitle>
-            <div className="flex h-full flex-col">
-              <SidebarContent onNavigate={() => setOpen(false)} />
-              <div className="mt-auto">
+            <div className="flex h-full flex-col pb-[env(safe-area-inset-bottom)]">
+              <SidebarContent onNavigate={() => { setOpen(false); document.body.dataset.overlayOpen = ""; }} />
+              <div className="mt-auto pb-4">
                 <Button variant="ghost" size="sm" onClick={signOut} className="w-full justify-start text-muted-foreground hover:text-neon-red">
                   <LogOut className="mr-2 h-4 w-4" /> Sign out
                 </Button>
@@ -117,6 +120,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </Avatar>
         </Link>
       </header>
+
 
       <div className="md:grid md:min-h-screen md:grid-cols-[240px_1fr]">
         {/* Desktop sidebar */}
@@ -141,7 +145,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               </Avatar>
             </Link>
           </header>
-          <main className="flex-1 overflow-auto px-4 py-4 md:px-6 md:py-4">{children}</main>
+          <main className="flex-1 overflow-auto px-4 py-4 pb-28 md:px-6 md:py-4 md:pb-8">{children}</main>
         </div>
       </div>
     </div>

@@ -35,7 +35,7 @@ function Landing() {
       <Particles density={90} />
       <header className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
         <div className="flex items-center gap-2">
-          <Shield className="h-6 w-6 text-neon-cyan" />
+          <img src="/favicon.png" alt="AI-ZeroDay Logo" className="h-6 w-6 object-contain" />
           <span className="font-display tracking-widest neon-text">AI-ZERODAY</span>
         </div>
         <nav className="flex items-center gap-3 text-sm">

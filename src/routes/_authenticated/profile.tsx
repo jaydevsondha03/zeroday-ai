@@ -87,6 +87,20 @@ function ProfilePage() {
     }
   }
 
+  async function onDeletePhoto() {
+    if (!profile?.avatar_url) return;
+    setUploading(true);
+    try {
+      await supabase.storage.from("avatars").remove([profile.avatar_url]);
+      await saveMut.mutateAsync({ avatar_url: null });
+      setAvatarUrl(null);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Delete failed");
+    } finally {
+      setUploading(false);
+    }
+  }
+
   const initial = (displayName || profile?.email || "?").charAt(0).toUpperCase();
 
   return (
@@ -102,9 +116,16 @@ function ProfilePage() {
           </Avatar>
           <input ref={fileInput} type="file" accept="image/*" hidden onChange={onPickFile} />
           <Button className="mt-4 w-full" variant="secondary" onClick={() => fileInput.current?.click()} disabled={uploading}>
-            {uploading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Uploading</> : <><Upload className="mr-2 h-4 w-4" /> Change photo</>}
+            {uploading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Working</> : <><Upload className="mr-2 h-4 w-4" /> {profile?.avatar_url ? "Change photo" : "Upload photo"}</>}
           </Button>
+          {profile?.avatar_url && (
+            <Button className="mt-2 w-full text-neon-red hover:text-neon-red" variant="ghost" onClick={onDeletePhoto} disabled={uploading}>
+              <Trash2 className="mr-2 h-4 w-4" /> Delete photo
+            </Button>
+          )}
+          <p className="mt-2 text-xs text-muted-foreground text-center">Without a photo, your initial is shown as the default avatar.</p>
         </div>
+
 
         <div className="glass p-6 lg:col-span-2">
           <div className="space-y-4">

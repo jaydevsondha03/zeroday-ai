@@ -12,7 +12,7 @@ import { toast } from "sonner";
 
 const predictionsQO = queryOptions({ queryKey: ["predictions"], queryFn: () => listPredictions() });
 
-export const Route = createFileRoute("/_authenticated/history")({
+export const Route = createFileRoute("/_authenticated/history/")({
   loader: ({ context }) => context.queryClient.ensureQueryData(predictionsQO),
   head: () => ({
     meta: [

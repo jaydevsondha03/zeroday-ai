@@ -70,6 +70,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:site_name", content: "AI-ZeroDay-Predictor" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "google-site-verification", content: "UwEWkygdasjDyLHWDOP7V6GldLyrDvHgOl_oCEs8ABc" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },

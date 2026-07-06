@@ -38,6 +38,24 @@ function AuthPage() {
   const [loading, setLoading] = useState(false);
 
   const [registered, setRegistered] = useState<string | null>(null);
+  const [forgot, setForgot] = useState(false);
+
+  async function sendReset() {
+    if (!email) return toast.error("Enter your email above first");
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) throw error;
+      toast.success("Password reset email sent. Link expires in 15 minutes.");
+      setForgot(false);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not send reset email");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();

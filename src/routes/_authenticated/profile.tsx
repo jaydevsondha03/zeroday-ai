@@ -38,6 +38,32 @@ function ProfilePage() {
   const [displayName, setDisplayName] = useState(profile?.display_name ?? "");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [currentPw, setCurrentPw] = useState("");
+  const [newPw, setNewPw] = useState("");
+  const [confirmPw, setConfirmPw] = useState("");
+  const [changingPw, setChangingPw] = useState(false);
+
+  async function changePassword(e: React.FormEvent) {
+    e.preventDefault();
+    if (newPw.length < 8) return toast.error("New password must be at least 8 characters");
+    if (newPw !== confirmPw) return toast.error("New passwords do not match");
+    if (newPw === currentPw) return toast.error("New password must differ from current password");
+    setChangingPw(true);
+    try {
+      if (!profile?.email) throw new Error("Missing account email");
+      // Re-verify current password
+      const { error: verifyErr } = await supabase.auth.signInWithPassword({ email: profile.email, password: currentPw });
+      if (verifyErr) throw new Error("Current password is incorrect");
+      const { error } = await supabase.auth.updateUser({ password: newPw });
+      if (error) throw error;
+      setCurrentPw(""); setNewPw(""); setConfirmPw("");
+      toast.success("Password changed successfully");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not change password");
+    } finally {
+      setChangingPw(false);
+    }
+  }
 
   useEffect(() => {
     let cancelled = false;

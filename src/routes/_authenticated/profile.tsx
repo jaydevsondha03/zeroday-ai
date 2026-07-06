@@ -43,6 +43,7 @@ function ProfilePage() {
   const [newPw, setNewPw] = useState("");
   const [confirmPw, setConfirmPw] = useState("");
   const [changingPw, setChangingPw] = useState(false);
+  const [pwOpen, setPwOpen] = useState(false);
 
   async function changePassword(e: React.FormEvent) {
     e.preventDefault();

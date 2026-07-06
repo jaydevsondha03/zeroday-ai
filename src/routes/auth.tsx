@@ -38,6 +38,24 @@ function AuthPage() {
   const [loading, setLoading] = useState(false);
 
   const [registered, setRegistered] = useState<string | null>(null);
+  const [forgot, setForgot] = useState(false);
+
+  async function sendReset() {
+    if (!email) return toast.error("Enter your email above first");
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) throw error;
+      toast.success("Password reset email sent. Link expires in 15 minutes.");
+      setForgot(false);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not send reset email");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -123,8 +141,23 @@ function AuthPage() {
                 <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
               </div>
               <div>
-                <Label htmlFor="password">Password</Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password">Password</Label>
+                  {!isRegister && (
+                    <button type="button" onClick={() => setForgot((v) => !v)} className="text-xs text-neon-cyan hover:underline">
+                      Forgot password?
+                    </button>
+                  )}
+                </div>
                 <Input id="password" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} autoComplete={isRegister ? "new-password" : "current-password"} />
+                {forgot && !isRegister && (
+                  <div className="mt-2 rounded-md border border-neon-cyan/30 bg-neon-cyan/5 p-3">
+                    <p className="text-xs text-muted-foreground">We'll send a reset link to the email above. It expires in 15 minutes.</p>
+                    <Button type="button" size="sm" variant="secondary" className="mt-2 w-full" onClick={sendReset} disabled={loading}>
+                      Send reset link
+                    </Button>
+                  </div>
+                )}
               </div>
               <Button type="submit" disabled={loading} className="w-full neon-glow">
                 {loading ? "Processing…" : isRegister ? "Create account" : "Sign in"}

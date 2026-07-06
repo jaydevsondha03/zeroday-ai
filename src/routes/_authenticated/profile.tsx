@@ -38,6 +38,32 @@ function ProfilePage() {
   const [displayName, setDisplayName] = useState(profile?.display_name ?? "");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [currentPw, setCurrentPw] = useState("");
+  const [newPw, setNewPw] = useState("");
+  const [confirmPw, setConfirmPw] = useState("");
+  const [changingPw, setChangingPw] = useState(false);
+
+  async function changePassword(e: React.FormEvent) {
+    e.preventDefault();
+    if (newPw.length < 8) return toast.error("New password must be at least 8 characters");
+    if (newPw !== confirmPw) return toast.error("New passwords do not match");
+    if (newPw === currentPw) return toast.error("New password must differ from current password");
+    setChangingPw(true);
+    try {
+      if (!profile?.email) throw new Error("Missing account email");
+      // Re-verify current password
+      const { error: verifyErr } = await supabase.auth.signInWithPassword({ email: profile.email, password: currentPw });
+      if (verifyErr) throw new Error("Current password is incorrect");
+      const { error } = await supabase.auth.updateUser({ password: newPw });
+      if (error) throw error;
+      setCurrentPw(""); setNewPw(""); setConfirmPw("");
+      toast.success("Password changed successfully");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not change password");
+    } finally {
+      setChangingPw(false);
+    }
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -145,6 +171,28 @@ function ProfilePage() {
             <Button onClick={() => saveMut.mutate({ display_name: displayName })} disabled={saveMut.isPending} className="neon-glow">
               {saveMut.isPending ? "Saving…" : "Save changes"}
             </Button>
+          </div>
+
+          <div className="mt-8 border-t border-border/40 pt-6">
+            <h2 className="font-display text-lg">Change password</h2>
+            <p className="mt-1 text-sm text-muted-foreground">Enter your current password, then choose a new one (at least 8 characters).</p>
+            <form onSubmit={changePassword} className="mt-4 space-y-3">
+              <div>
+                <Label htmlFor="currentPw">Current password</Label>
+                <Input id="currentPw" type="password" value={currentPw} onChange={(e) => setCurrentPw(e.target.value)} autoComplete="current-password" required />
+              </div>
+              <div>
+                <Label htmlFor="newPw">New password</Label>
+                <Input id="newPw" type="password" value={newPw} onChange={(e) => setNewPw(e.target.value)} autoComplete="new-password" minLength={8} required />
+              </div>
+              <div>
+                <Label htmlFor="confirmPw">Confirm new password</Label>
+                <Input id="confirmPw" type="password" value={confirmPw} onChange={(e) => setConfirmPw(e.target.value)} autoComplete="new-password" minLength={8} required />
+              </div>
+              <Button type="submit" disabled={changingPw} variant="secondary">
+                {changingPw ? "Updating…" : "Update password"}
+              </Button>
+            </form>
           </div>
 
           <div className="mt-8 border-t border-border/40 pt-6">

@@ -178,24 +178,40 @@ function ProfilePage() {
 
           <div className="mt-8 border-t border-border/40 pt-6">
             <h2 className="font-display text-lg">Change password</h2>
-            <p className="mt-1 text-sm text-muted-foreground">Enter your current password, then choose a new one (at least 8 characters).</p>
-            <form onSubmit={changePassword} className="mt-4 space-y-3">
-              <div>
-                <Label htmlFor="currentPw">Current password</Label>
-                <Input id="currentPw" type="password" value={currentPw} onChange={(e) => setCurrentPw(e.target.value)} autoComplete="current-password" required />
-              </div>
-              <div>
-                <Label htmlFor="newPw">New password</Label>
-                <Input id="newPw" type="password" value={newPw} onChange={(e) => setNewPw(e.target.value)} autoComplete="new-password" minLength={8} required />
-              </div>
-              <div>
-                <Label htmlFor="confirmPw">Confirm new password</Label>
-                <Input id="confirmPw" type="password" value={confirmPw} onChange={(e) => setConfirmPw(e.target.value)} autoComplete="new-password" minLength={8} required />
-              </div>
-              <Button type="submit" disabled={changingPw} variant="secondary">
-                {changingPw ? "Updating…" : "Update password"}
-              </Button>
-            </form>
+            <p className="mt-1 text-sm text-muted-foreground">Securely update your account password.</p>
+            <Dialog open={pwOpen} onOpenChange={setPwOpen}>
+              <DialogTrigger asChild>
+                <Button variant="secondary" className="mt-4">Change password</Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Change password</DialogTitle>
+                  <DialogDescription>Enter your current password, then choose a new one (at least 8 characters).</DialogDescription>
+                </DialogHeader>
+                <form id="change-pw-form" onSubmit={changePassword} className="space-y-3">
+                  <div>
+                    <Label htmlFor="currentPw">Current password</Label>
+                    <Input id="currentPw" type="password" value={currentPw} onChange={(e) => setCurrentPw(e.target.value)} autoComplete="current-password" required />
+                  </div>
+                  <div>
+                    <Label htmlFor="newPw">New password</Label>
+                    <Input id="newPw" type="password" value={newPw} onChange={(e) => setNewPw(e.target.value)} autoComplete="new-password" minLength={8} required />
+                  </div>
+                  <div>
+                    <Label htmlFor="confirmPw">Confirm new password</Label>
+                    <Input id="confirmPw" type="password" value={confirmPw} onChange={(e) => setConfirmPw(e.target.value)} autoComplete="new-password" minLength={8} required />
+                  </div>
+                </form>
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <Button type="button" variant="outline">Cancel</Button>
+                  </DialogClose>
+                  <Button type="submit" form="change-pw-form" disabled={changingPw}>
+                    {changingPw ? "Updating…" : "Update password"}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </div>
 
           <div className="mt-8 border-t border-border/40 pt-6">

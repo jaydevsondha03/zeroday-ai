@@ -59,6 +59,7 @@ function ProfilePage() {
       const { error } = await supabase.auth.updateUser({ password: newPw });
       if (error) throw error;
       setCurrentPw(""); setNewPw(""); setConfirmPw("");
+      setPwOpen(false);
       toast.success("Password changed successfully");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not change password");

@@ -174,6 +174,28 @@ function ProfilePage() {
           </div>
 
           <div className="mt-8 border-t border-border/40 pt-6">
+            <h2 className="font-display text-lg">Change password</h2>
+            <p className="mt-1 text-sm text-muted-foreground">Enter your current password, then choose a new one (at least 8 characters).</p>
+            <form onSubmit={changePassword} className="mt-4 space-y-3">
+              <div>
+                <Label htmlFor="currentPw">Current password</Label>
+                <Input id="currentPw" type="password" value={currentPw} onChange={(e) => setCurrentPw(e.target.value)} autoComplete="current-password" required />
+              </div>
+              <div>
+                <Label htmlFor="newPw">New password</Label>
+                <Input id="newPw" type="password" value={newPw} onChange={(e) => setNewPw(e.target.value)} autoComplete="new-password" minLength={8} required />
+              </div>
+              <div>
+                <Label htmlFor="confirmPw">Confirm new password</Label>
+                <Input id="confirmPw" type="password" value={confirmPw} onChange={(e) => setConfirmPw(e.target.value)} autoComplete="new-password" minLength={8} required />
+              </div>
+              <Button type="submit" disabled={changingPw} variant="secondary">
+                {changingPw ? "Updating…" : "Update password"}
+              </Button>
+            </form>
+          </div>
+
+          <div className="mt-8 border-t border-border/40 pt-6">
             <h2 className="font-display text-lg text-neon-red">Danger zone</h2>
             <p className="mt-1 text-sm text-muted-foreground">Permanently delete your account and all associated scans, threads, and profile data. This cannot be undone.</p>
             <AlertDialog>
